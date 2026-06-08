@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aplicação — Processo de Reorientação Profissional</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #FDDED5;
+      color: #282828;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* HEADER */
+    header {
+      width: 100%;
+      text-align: center;
+      padding: 32px 24px 0;
+    }
+
+    .logo-text {
+      font-size: 30px;
+      font-weight: 800;
+      color: #3E658E;
+      letter-spacing: -1px;
+    }
+
+    .logo-sub {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      color: #3E658E;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+
+    /* PROGRESS */
+    .progress-wrapper {
+      width: 100%;
+      max-width: 640px;
+      padding: 32px 24px 0;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .progress-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #3E658E;
+      letter-spacing: 0.5px;
+    }
+
+    .progress-count {
+      font-size: 12px;
+      font-weight: 500;
+      color: #282828;
+      opacity: 0.45;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: rgba(62,101,142,0.15);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: #3E658E;
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+
+    /* CARD */
+    .card {
+      background: white;
+      border-radius: 24px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 640px;
+      margin: 20px 24px 40px;
+      box-shadow: 0 4px 32px rgba(62, 101, 142, 0.08);
+    }
+
+    @media (max-width: 640px) {
+      .card { padding: 28px 20px; margin: 16px 16px 32px; }
+    }
+
+    /* SEÇÕES */
+    .secao { display: none; }
+    .secao.ativa { display: block; }
+
+    .secao-titulo {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #FD745D;
+      margin-bottom: 8px;
+    }
+
+    .secao-heading {
+      font-size: 22px;
+      font-weight: 800;
+      color: #3E658E;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+
+    .secao-desc {
+      font-size: 14px;
+      color: #282828;
+      opacity: 0.65;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    /* CAMPOS */
+    .campo {
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #282828;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    label .obrig {
+      color: #FD745D;
+      margin-left: 2px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid #e0dbd8;
+      border-radius: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      color: #282828;
+      background: #fafafa;
+      outline: none;
+      transition: border-color 0.2s;
+      resize: vertical;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #3E658E;
+      background: white;
+    }
+
+    input.erro, textarea.erro, .radio-group.erro, .check-group.erro {
+      border-color: #FD745D !important;
+    }
+
+    textarea { min-height: 100px; }
+
+    /* RADIO / CHECK */
+    .radio-group, .check-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border: 1.5px solid transparent;
+      border-radius: 12px;
+      padding: 2px;
+    }
+
+    .opcao {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1.5px solid #e0dbd8;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: #fafafa;
+    }
+
+    .opcao:hover { border-color: #3E658E; background: white; }
+
+    .opcao input[type="radio"],
+    .opcao input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      accent-color: #3E658E;
+      margin-top: 1px;
+      border: none;
+      padding: 0;
+      background: none;
+    }
+
+    .opcao.selecionada {
+      border-color: #3E658E;
+      background: #f0f4f8;
+    }
+
+    .opcao-texto {
+      font-size: 14px;
+      font-weight: 500;
+      color: #282828;
+      line-height: 1.4;
+    }
+
+    /* BOTÕES */
+    .botoes {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 36px;
+    }
+
+    .btn {
+      padding: 15px 28px;
+      border-radius: 12px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s, transform 0.1s;
+      letter-spacing: 0.3px;
+    }
+
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-avancar {
+      background: #FD745D;
+      color: white;
+      flex: 1;
+    }
+
+    .btn-voltar {
+      background: #f0ece9;
+      color: #282828;
+      min-width: 100px;
+    }
+
+    .btn-enviar {
+      background: #3E658E;
+      color: white;
+      flex: 1;
+    }
+
+    /* MSG ERRO */
+    .msg-erro {
+      font-size: 12px;
+      color: #FD745D;
+      font-weight: 600;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .msg-erro.visivel { display: block; }
+
+    /* SUCESSO */
+    .tela-sucesso {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .sucesso-icone {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .sucesso-titulo {
+      font-size: 24px;
+      font-weight: 800;
+      color: #3E658E;
+      margin-bottom: 12px;
+    }
+
+    .sucesso-texto {
+      font-size: 15px;
+      color: #282828;
+      opacity: 0.75;
+      line-height: 1.7;
+    }
+
+    /* CAMPOS DOIS */
+    .campos-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 480px) {
+      .campos-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-text">Rumo</div>
+    <div class="logo-sub">Orientação Profissional</div>
+  </header>
+
+  <div class="progress-wrapper" id="progress-wrapper">
+    <div class="progress-info">
+      <span class="progress-label" id="label-secao">Dados pessoais</span>
+      <span class="progress-count" id="count-secao">1 de 5</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="barra" style="width: 20%"></div>
+    </div>
+  </div>
+
+  <div class="card">
+
+    <!-- SEÇÃO 1: Dados pessoais -->
+    <div class="secao ativa" id="s1">
+      <div class="secao-titulo">Passo 1 de 5</div>
+      <h2 class="secao-heading">Dados pessoais</h2>
+      <p class="secao-desc">Preciso de algumas informações básicas para entrar em contato com você.</p>
+
+      <div class="campo">
+        <label for="nome">Nome completo <span class="obrig">*</span></label>
+        <input type="text" id="nome" placeholder="Seu nome completo" />
+        <div class="msg-erro" id="erro-nome">Por favor, preencha seu nome.</div>
+      </div>
+
+      <div class="campos-grid">
+        <div class="campo">
+          <label for="idade">Idade <span class="obrig">*</span></label>
+          <input type="number" id="idade" placeholder="Ex: 32" min="16" max="80" />
+          <div class="msg-erro" id="erro-idade">Preencha sua idade.</div>
+        </div>
+        <div class="campo">
+          <label for="cidade">Cidade / Estado <span class="obrig">*</span></label>
+          <input type="text" id="cidade" placeholder="Ex: São Paulo, SP" />
+          <div class="msg-erro" id="erro-cidade">Preencha sua cidade.</div>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="whatsapp">WhatsApp <span class="obrig">*</span></label>
+        <input type="tel" id="whatsapp" placeholder="(11) 99999-9999" />
+        <div class="msg-erro" id="erro-whatsapp">Preencha seu WhatsApp.</div>
+      </div>
+
+      <div class="campo">
+        <label for="email">E-mail <span class="obrig">*</span></label>
+        <input type="email" id="email" placeholder="seu@email.com" />
+        <div class="msg-erro" id="erro-email">Preencha um e-mail válido.</div>
+      </div>
+
+      <div class="botoes">
+        <button class="btn btn-avancar" onclick="avancar(1)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 2: Situação profissional -->
+    <div class="secao" id="s2">
+      <div class="secao-titulo">Passo 2 de 5</div>
+      <h2 class="secao-heading">Situação profissional</h2>
+      <p class="secao-desc">Conte um pouco sobre onde você está agora.</p>
+
+      <div class="campo">
+        <label>Qual a sua situação atual? <span class="obrig">*</span></label>
+        <div class="radio-group" id="rg-situacao">
+          <label class="opcao"><input type="radio" name="situacao" value="Estudante" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Estudante</span></label>
+          <label class="opcao"><input type="radio" name="situacao" value="Trabalhando" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Trabalhando</span></label>
+          <label class="opcao"><input type="radio" name="situacao" value="Em transição profissional" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Em transição profissional</span></label>
+          <label class="opcao"><input type="radio" name="situacao" value="Desempregado" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Desempregado</span></label>
+        </div>
+        <div class="msg-erro" id="erro-situacao">Selecione uma opção.</div>
+      </div>
+
+      <div class="campo">
+        <label for="ocupacao">Área, curso ou ocupação atual, se houver</label>
+        <input type="text" id="ocupacao" placeholder="Ex: Enfermagem, gestora de RH, estudante de Direito..." />
+      </div>
+
+      <div class="campo">
+        <label for="motivo">O que te faz procurar reorientação profissional agora? <span class="obrig">*</span></label>
+        <textarea id="motivo" placeholder="Descreva com suas próprias palavras..."></textarea>
+        <div class="msg-erro" id="erro-motivo">Por favor, responda esta pergunta.</div>
+      </div>
+
+      <div class="botoes">
+        <button class="btn btn-voltar" onclick="voltar(2)">← Voltar</button>
+        <button class="btn btn-avancar" onclick="avancar(2)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 3: Contexto e motivação -->
+    <div class="secao" id="s3">
+      <div class="secao-titulo">Passo 3 de 5</div>
+      <h2 class="secao-heading">Contexto e motivação</h2>
+      <p class="secao-desc">Quero entender melhor o que você está vivendo.</p>
+
+      <div class="campo">
+        <label for="incomodo">O que mais tem te incomodado na sua vida profissional ou acadêmica neste momento? <span class="obrig">*</span></label>
+        <textarea id="incomodo" placeholder="Pode ser algo concreto ou uma sensação difícil de nomear..."></textarea>
+        <div class="msg-erro" id="erro-incomodo">Por favor, responda esta pergunta.</div>
+      </div>
+
+      <div class="campo">
+        <label>Esse incômodo... <span class="obrig">*</span></label>
+        <div class="radio-group" id="rg-incomodo-tempo">
+          <label class="opcao"><input type="radio" name="incomodo_tempo" value="É recente" onchange="selecionarOpcao(this)" /><span class="opcao-texto">É recente</span></label>
+          <label class="opcao"><input type="radio" name="incomodo_tempo" value="Vem se repetindo ao longo do tempo" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Vem se repetindo ao longo do tempo</span></label>
+          <label class="opcao"><input type="radio" name="incomodo_tempo" value="Aparece em diferentes fases da minha vida" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Aparece em diferentes fases da minha vida</span></label>
+        </div>
+        <div class="msg-erro" id="erro-incomodo-tempo">Selecione uma opção.</div>
+      </div>
+
+      <div class="campo">
+        <label for="tentativas">O que você já tentou fazer para lidar com essa situação até agora? <span class="obrig">*</span></label>
+        <textarea id="tentativas" placeholder="Cursos, terapia, mudanças de emprego, conversas... qualquer tentativa conta."></textarea>
+        <div class="msg-erro" id="erro-tentativas">Por favor, responda esta pergunta.</div>
+      </div>
+
+      <div class="campo">
+        <label>Você sente que a sua insatisfação tem mais a ver com: <span class="obrig">*</span></label>
+        <div class="radio-group" id="rg-insatisfacao">
+          <label class="opcao"><input type="radio" name="insatisfacao" value="A profissão" onchange="selecionarOpcao(this)" /><span class="opcao-texto">A profissão</span></label>
+          <label class="opcao"><input type="radio" name="insatisfacao" value="O cargo ou a função" onchange="selecionarOpcao(this)" /><span class="opcao-texto">O cargo ou a função</span></label>
+          <label class="opcao"><input type="radio" name="insatisfacao" value="O ambiente de trabalho" onchange="selecionarOpcao(this)" /><span class="opcao-texto">O ambiente de trabalho</span></label>
+          <label class="opcao"><input type="radio" name="insatisfacao" value="Não consigo identificar" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Não consigo identificar</span></label>
+          <label class="opcao"><input type="radio" name="insatisfacao" value="Outro" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Outro</span></label>
+        </div>
+        <div class="msg-erro" id="erro-insatisfacao">Selecione uma opção.</div>
+      </div>
+
+      <div class="campo">
+        <label for="expectativa">O que você espera que o processo te ajude a construir? <span class="obrig">*</span></label>
+        <textarea id="expectativa" placeholder="Pode ser um objetivo concreto ou uma sensação que quer alcançar..."></textarea>
+        <div class="msg-erro" id="erro-expectativa">Por favor, responda esta pergunta.</div>
+      </div>
+
+      <div class="campo">
+        <label>Marque as frases que mais combinam com você hoje: <span class="obrig">*</span></label>
+        <div class="check-group" id="cg-frases">
+          <label class="opcao"><input type="checkbox" name="frases" value="Quero entender melhor quem eu sou" onchange="selecionarCheck(this)" /><span class="opcao-texto">Quero entender melhor quem eu sou</span></label>
+          <label class="opcao"><input type="checkbox" name="frases" value="Quero tomar decisões com mais segurança" onchange="selecionarCheck(this)" /><span class="opcao-texto">Quero tomar decisões com mais segurança</span></label>
+          <label class="opcao"><input type="checkbox" name="frases" value="Quero que alguém me diga o que fazer" onchange="selecionarCheck(this)" /><span class="opcao-texto">Quero que alguém me diga o que fazer</span></label>
+          <label class="opcao"><input type="checkbox" name="frases" value="Quero sair logo dessa situação" onchange="selecionarCheck(this)" /><span class="opcao-texto">Quero sair logo dessa situação</span></label>
+        </div>
+        <div class="msg-erro" id="erro-frases">Selecione ao menos uma opção.</div>
+      </div>
+
+      <div class="campo">
+        <label>Hoje você sente que tem espaço emocional e prático para se dedicar a um processo de reflexão? <span class="obrig">*</span></label>
+        <div class="radio-group" id="rg-espaco">
+          <label class="opcao"><input type="radio" name="espaco" value="Sim" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Sim</span></label>
+          <label class="opcao"><input type="radio" name="espaco" value="Não" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Não</span></label>
+          <label class="opcao"><input type="radio" name="espaco" value="Talvez" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Talvez</span></label>
+        </div>
+        <div class="msg-erro" id="erro-espaco">Selecione uma opção.</div>
+      </div>
+
+      <div class="botoes">
+        <button class="btn btn-voltar" onclick="voltar(3)">← Voltar</button>
+        <button class="btn btn-avancar" onclick="avancar(3)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 4: Saúde -->
+    <div class="secao" id="s4">
+      <div class="secao-titulo">Passo 4 de 5</div>
+      <h2 class="secao-heading">Saúde</h2>
+      <p class="secao-desc">Essas informações me ajudam a entender o seu momento de forma mais completa.</p>
+
+      <div class="campo">
+        <label>Você faz acompanhamento com psicólogo? <span class="obrig">*</span></label>
+        <div class="radio-group" id="rg-psicologo">
+          <label class="opcao"><input type="radio" name="psicologo" value="Sim" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Sim</span></label>
+          <label class="opcao"><input type="radio" name="psicologo" value="Nunca fiz" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Nunca fiz</span></label>
+          <label class="opcao"><input type="radio" name="psicologo" value="Já fiz, mas não faço mais" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Já fiz, mas não faço mais</span></label>
+        </div>
+        <div class="msg-erro" id="erro-psicologo">Selecione uma opção.</div>
+      </div>
+
+      <div class="campo">
+        <label>Você faz acompanhamento psiquiátrico? <span class="obrig">*</span></label>
+        <div class="radio-group" id="rg-psiquiatra">
+          <label class="opcao"><input type="radio" name="psiquiatra" value="Sim" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Sim</span></label>
+          <label class="opcao"><input type="radio" name="psiquiatra" value="Nunca fiz" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Nunca fiz</span></label>
+          <label class="opcao"><input type="radio" name="psiquiatra" value="Já fiz, mas não faço mais" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Já fiz, mas não faço mais</span></label>
+        </div>
+        <div class="msg-erro" id="erro-psiquiatra">Selecione uma opção.</div>
+      </div>
+
+      <div class="campo">
+        <label>Você tem algum diagnóstico psiquiátrico? <span class="obrig">*</span></label>
+        <div class="radio-group" id="rg-diagnostico">
+          <label class="opcao"><input type="radio" name="diagnostico" value="Sim" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Sim</span></label>
+          <label class="opcao"><input type="radio" name="diagnostico" value="Não" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Não</span></label>
+        </div>
+        <div class="msg-erro" id="erro-diagnostico">Selecione uma opção.</div>
+      </div>
+
+      <div class="campo">
+        <label>Você usa alguma medicação psiquiátrica? <span class="obrig">*</span></label>
+        <div class="radio-group" id="rg-medicacao">
+          <label class="opcao"><input type="radio" name="medicacao" value="Sim" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Sim</span></label>
+          <label class="opcao"><input type="radio" name="medicacao" value="Não" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Não</span></label>
+        </div>
+        <div class="msg-erro" id="erro-medicacao">Selecione uma opção.</div>
+      </div>
+
+      <div class="botoes">
+        <button class="btn btn-voltar" onclick="voltar(4)">← Voltar</button>
+        <button class="btn btn-avancar" onclick="avancar(4)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 5: Disponibilidade -->
+    <div class="secao" id="s5">
+      <div class="secao-titulo">Passo 5 de 5</div>
+      <h2 class="secao-heading">Disponibilidade</h2>
+      <p class="secao-desc">Os encontros são semanais, online, com 50 minutos de duração.</p>
+
+      <div class="campo">
+        <label>Qual a sua disponibilidade de horário? <span class="obrig">*</span></label>
+        <div class="radio-group" id="rg-horario">
+          <label class="opcao"><input type="radio" name="horario" value="Manhã" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Manhã</span></label>
+          <label class="opcao"><input type="radio" name="horario" value="Tarde" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Tarde</span></label>
+          <label class="opcao"><input type="radio" name="horario" value="Noite" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Noite</span></label>
+        </div>
+        <div class="msg-erro" id="erro-horario">Selecione uma opção.</div>
+      </div>
+
+      <div class="campo">
+        <label>Quando você gostaria de iniciar o processo? <span class="obrig">*</span></label>
+        <div class="radio-group" id="rg-inicio">
+          <label class="opcao"><input type="radio" name="inicio" value="Imediatamente" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Imediatamente</span></label>
+          <label class="opcao"><input type="radio" name="inicio" value="Nos próximos 15 dias" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Nos próximos 15 dias</span></label>
+          <label class="opcao"><input type="radio" name="inicio" value="No próximo mês" onchange="selecionarOpcao(this)" /><span class="opcao-texto">No próximo mês</span></label>
+          <label class="opcao"><input type="radio" name="inicio" value="Ainda não tenho certeza" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Ainda não tenho certeza</span></label>
+        </div>
+        <div class="msg-erro" id="erro-inicio">Selecione uma opção.</div>
+      </div>
+
+      <div class="campo">
+        <label>Considerando que a orientação profissional é personalizada, com 8 encontros de 50 minutos ao vivo, quanto você estaria disposto a investir por esse processo? <span class="obrig">*</span></label>
+        <div class="radio-group" id="rg-investimento">
+          <label class="opcao"><input type="radio" name="investimento" value="Até R$ 900" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Até R$ 900</span></label>
+          <label class="opcao"><input type="radio" name="investimento" value="Até R$ 1.500" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Até R$ 1.500</span></label>
+          <label class="opcao"><input type="radio" name="investimento" value="Até R$ 2.000" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Até R$ 2.000</span></label>
+          <label class="opcao"><input type="radio" name="investimento" value="Até R$ 2.500" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Até R$ 2.500</span></label>
+        </div>
+        <div class="msg-erro" id="erro-investimento">Selecione uma opção.</div>
+      </div>
+
+      <div class="campo">
+        <label>Independente da orientação personalizada, existe uma versão desse processo pensada para quem quer caminhar no próprio ritmo. Quer saber mais sobre ela? <span class="obrig">*</span></label>
+        <div class="radio-group" id="rg-autoguiada">
+          <label class="opcao"><input type="radio" name="autoguiada" value="Sim" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Sim</span></label>
+          <label class="opcao"><input type="radio" name="autoguiada" value="Talvez depois" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Talvez depois</span></label>
+          <label class="opcao"><input type="radio" name="autoguiada" value="Não preciso" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Não preciso</span></label>
+        </div>
+        <div class="msg-erro" id="erro-autoguiada">Selecione uma opção.</div>
+      </div>
+
+      <div class="campo">
+        <label for="observacoes">Alguma pergunta ou observação que queira compartilhar?</label>
+        <textarea id="observacoes" placeholder="Este espaço é livre. Pode deixar em branco se preferir."></textarea>
+      </div>
+
+      <div class="botoes">
+        <button class="btn btn-voltar" onclick="voltar(5)">← Voltar</button>
+        <button class="btn btn-enviar" onclick="enviar()">Enviar aplicação</button>
+      </div>
+    </div>
+
+    <!-- TELA DE SUCESSO -->
+    <div class="tela-sucesso" id="sucesso">
+      <div class="sucesso-icone">🎯</div>
+      <h2 class="sucesso-titulo">Aplicação recebida!</h2>
+      <p class="sucesso-texto">
+        Obrigado por compartilhar tudo isso.<br /><br />
+        Analisarei sua aplicação e entrarei em contato em até 48h pelo WhatsApp informado.
+      </p>
+    </div>
+
+  </div>
+
+  <script>
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzeLS01RNWiJDUHknQnP1af9j3BKMcYQCdOvQ0JCvUzAnNLkO-681t33VgCSAVPY8kL/exec';
+
+    const secoes = ['s1','s2','s3','s4','s5'];
+    const labels = [
+      'Dados pessoais',
+      'Situação profissional',
+      'Contexto e motivação',
+      'Saúde',
+      'Disponibilidade'
+    ];
+
+    let secaoAtual = 1;
+
+    function atualizarProgresso(n) {
+      document.getElementById('label-secao').textContent = labels[n-1];
+      document.getElementById('count-secao').textContent = n + ' de 5';
+      document.getElementById('barra').style.width = (n * 20) + '%';
+    }
+
+    function selecionarOpcao(input) {
+      const grupo = input.closest('.radio-group');
+      grupo.querySelectorAll('.opcao').forEach(o => o.classList.remove('selecionada'));
+      input.closest('.opcao').classList.add('selecionada');
+    }
+
+    function selecionarCheck(input) {
+      input.closest('.opcao').classList.toggle('selecionada', input.checked);
+    }
+
+    function mostrarErro(id, mostrar) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('visivel', mostrar);
+    }
+
+    function validar(n) {
+      let ok = true;
+
+      if (n === 1) {
+        const nome = document.getElementById('nome').value.trim();
+        const idade = document.getElementById('idade').value.trim();
+        const cidade = document.getElementById('cidade').value.trim();
+        const wpp = document.getElementById('whatsapp').value.trim();
+        const email = document.getElementById('email').value.trim();
+        mostrarErro('erro-nome', !nome); if (!nome) ok = false;
+        mostrarErro('erro-idade', !idade); if (!idade) ok = false;
+        mostrarErro('erro-cidade', !cidade); if (!cidade) ok = false;
+        mostrarErro('erro-whatsapp', !wpp); if (!wpp) ok = false;
+        mostrarErro('erro-email', !email || !email.includes('@')); if (!email || !email.includes('@')) ok = false;
+      }
+
+      if (n === 2) {
+        const sit = document.querySelector('input[name="situacao"]:checked');
+        const motivo = document.getElementById('motivo').value.trim();
+        mostrarErro('erro-situacao', !sit); if (!sit) ok = false;
+        mostrarErro('erro-motivo', !motivo); if (!motivo) ok = false;
+      }
+
+      if (n === 3) {
+        const inc = document.getElementById('incomodo').value.trim();
+        const incT = document.querySelector('input[name="incomodo_tempo"]:checked');
+        const tent = document.getElementById('tentativas').value.trim();
+        const insf = document.querySelector('input[name="insatisfacao"]:checked');
+        const exp = document.getElementById('expectativa').value.trim();
+        const frases = document.querySelectorAll('input[name="frases"]:checked');
+        const esp = document.querySelector('input[name="espaco"]:checked');
+        mostrarErro('erro-incomodo', !inc); if (!inc) ok = false;
+        mostrarErro('erro-incomodo-tempo', !incT); if (!incT) ok = false;
+        mostrarErro('erro-tentativas', !tent); if (!tent) ok = false;
+        mostrarErro('erro-insatisfacao', !insf); if (!insf) ok = false;
+        mostrarErro('erro-expectativa', !exp); if (!exp) ok = false;
+        mostrarErro('erro-frases', frases.length === 0); if (frases.length === 0) ok = false;
+        mostrarErro('erro-espaco', !esp); if (!esp) ok = false;
+      }
+
+      if (n === 4) {
+        const ps = document.querySelector('input[name="psicologo"]:checked');
+        const pq = document.querySelector('input[name="psiquiatra"]:checked');
+        const dg = document.querySelector('input[name="diagnostico"]:checked');
+        const md = document.querySelector('input[name="medicacao"]:checked');
+        mostrarErro('erro-psicologo', !ps); if (!ps) ok = false;
+        mostrarErro('erro-psiquiatra', !pq); if (!pq) ok = false;
+        mostrarErro('erro-diagnostico', !dg); if (!dg) ok = false;
+        mostrarErro('erro-medicacao', !md); if (!md) ok = false;
+      }
+
+      if (n === 5) {
+        const hor = document.querySelector('input[name="horario"]:checked');
+        const ini = document.querySelector('input[name="inicio"]:checked');
+        const inv = document.querySelector('input[name="investimento"]:checked');
+        const aut = document.querySelector('input[name="autoguiada"]:checked');
+        mostrarErro('erro-horario', !hor); if (!hor) ok = false;
+        mostrarErro('erro-inicio', !ini); if (!ini) ok = false;
+        mostrarErro('erro-investimento', !inv); if (!inv) ok = false;
+        mostrarErro('erro-autoguiada', !aut); if (!aut) ok = false;
+      }
+
+      return ok;
+    }
+
+    function avancar(n) {
+      if (!validar(n)) return;
+      document.getElementById('s' + n).classList.remove('ativa');
+      secaoAtual = n + 1;
+      document.getElementById('s' + secaoAtual).classList.add('ativa');
+      atualizarProgresso(secaoAtual);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function voltar(n) {
+      document.getElementById('s' + n).classList.remove('ativa');
+      secaoAtual = n - 1;
+      document.getElementById('s' + secaoAtual).classList.add('ativa');
+      atualizarProgresso(secaoAtual);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function enviar() {
+      if (!validar(5)) return;
+
+      const frasesSel = Array.from(document.querySelectorAll('input[name="frases"]:checked')).map(i => i.value).join('; ');
+
+      const dados = {
+        nome: document.getElementById('nome').value.trim(),
+        idade: document.getElementById('idade').value.trim(),
+        cidade: document.getElementById('cidade').value.trim(),
+        whatsapp: document.getElementById('whatsapp').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        situacao: document.querySelector('input[name="situacao"]:checked')?.value || '',
+        ocupacao: document.getElementById('ocupacao').value.trim(),
+        motivo: document.getElementById('motivo').value.trim(),
+        incomodo: document.getElementById('incomodo').value.trim(),
+        incomodo_tempo: document.querySelector('input[name="incomodo_tempo"]:checked')?.value || '',
+        tentativas: document.getElementById('tentativas').value.trim(),
+        insatisfacao: document.querySelector('input[name="insatisfacao"]:checked')?.value || '',
+        expectativa: document.getElementById('expectativa').value.trim(),
+        frases: frasesSel,
+        espaco: document.querySelector('input[name="espaco"]:checked')?.value || '',
+        psicologo: document.querySelector('input[name="psicologo"]:checked')?.value || '',
+        psiquiatra: document.querySelector('input[name="psiquiatra"]:checked')?.value || '',
+        diagnostico: document.querySelector('input[name="diagnostico"]:checked')?.value || '',
+        medicacao: document.querySelector('input[name="medicacao"]:checked')?.value || '',
+        horario: document.querySelector('input[name="horario"]:checked')?.value || '',
+        inicio: document.querySelector('input[name="inicio"]:checked')?.value || '',
+        investimento: document.querySelector('input[name="investimento"]:checked')?.value || '',
+        autoguiada: document.querySelector('input[name="autoguiada"]:checked')?.value || '',
+        observacoes: document.getElementById('observacoes').value.trim(),
+        data: new Date().toLocaleString('pt-BR')
+      };
+
+      // Mostrar sucesso imediatamente (UX)
+      document.getElementById('s5').classList.remove('ativa');
+      document.getElementById('sucesso').style.display = 'block';
+      document.querySelector('.progress-wrapper').style.display = 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Enviar para planilha
+      if (APPS_SCRIPT_URL !== 'SEU_APPS_SCRIPT_URL_AQUI') {
+        fetch(APPS_SCRIPT_URL + '?payload=' + encodeURIComponent(JSON.stringify(dados)), {
+          method: 'GET',
+          mode: 'no-cors'
+        });
+      }
+    }
+  </script>
+
+</body>
+</html>
