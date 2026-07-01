@@ -607,6 +607,30 @@
   <script>
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzeLS01RNWiJDUHknQnP1af9j3BKMcYQCdOvQ0JCvUzAnNLkO-681t33VgCSAVPY8kL/exec';
 
+    // Mesmo projeto Supabase do rumo-crm — chave pública, protegida por RLS.
+    const SUPABASE_URL = 'https://ipgyrwxnvtuetnuyryzk.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_JELHL8UlHqaGdnhhD2Ycqg_LnCBoDjr';
+
+    // Envia a mesma aplicação para o CRM (Supabase), best-effort — se falhar,
+    // a pessoa já viu a tela de sucesso e não é bloqueada por isso.
+    async function enviarParaCRM(dados) {
+      const hoje = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' }); // AAAA-MM-DD
+      const r = await fetch(SUPABASE_URL + '/rest/v1/rpc/criar_aplicacao_reorientacao', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({
+          aplicacao: dados,
+          tarefa_texto: 'Entrar em contato pelo WhatsApp',
+          tarefa_data: hoje,
+        }),
+      });
+      if (!r.ok) throw new Error('CRM respondeu ' + r.status + ': ' + await r.text());
+    }
+
     const secoes = ['s1','s2','s3','s4','s5'];
     const labels = [
       'Dados pessoais',
@@ -767,6 +791,9 @@
           mode: 'no-cors'
         });
       }
+
+      // Enviar para o CRM (best-effort)
+      enviarParaCRM(dados).catch(err => console.error('Falha ao enviar aplicação pro CRM:', err));
     }
   </script>
 
