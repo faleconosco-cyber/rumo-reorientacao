@@ -631,6 +631,52 @@
       if (!r.ok) throw new Error('CRM respondeu ' + r.status + ': ' + await r.text());
     }
 
+    function mandarParaPlanilha(dados) {
+      if (APPS_SCRIPT_URL === 'SEU_APPS_SCRIPT_URL_AQUI') return;
+      fetch(APPS_SCRIPT_URL + '?payload=' + encodeURIComponent(JSON.stringify(dados)), {
+        method: 'GET',
+        mode: 'no-cors'
+      });
+    }
+
+    const espera = ms => new Promise(r => setTimeout(r, ms));
+
+    // Entre 04/06 e 08/07/2026 cinco aplicações caíram só na planilha: a função
+    // ainda não existia no banco, o CRM respondia 404 e o erro morria no console
+    // da pessoa. A candidata via "Aplicação recebida!", a planilha recebia, e
+    // nada aqui avisava. Dois meses assim.
+    //
+    // Agora, se o CRM recusar, tenta de novo duas vezes (a maioria das falhas de
+    // rede passa em segundos) e, se ainda assim não entrar, grava uma segunda
+    // linha na planilha marcada com o aviso. A planilha é o caminho que nunca
+    // falhou, então o alerta vai por onde ela já olha.
+    //
+    // O envio normal para a planilha continua saindo primeiro e sem espera
+    // nenhuma, igual antes. Nada aqui pode atrasar ou atrapalhar aquele.
+    async function enviarParaCrmComAviso(dados) {
+      const esperas = [0, 2000, 5000];
+      let ultimoErro;
+
+      for (const ms of esperas) {
+        if (ms) await espera(ms);
+        try {
+          await enviarParaCRM(dados);
+          return;
+        } catch (err) {
+          ultimoErro = err;
+          console.error('Falha ao enviar aplicação pro CRM:', err);
+        }
+      }
+
+      mandarParaPlanilha({
+        ...dados,
+        nome: 'NAO ENTROU NO CRM - ' + dados.nome,
+        observacoes: 'ATENCAO: esta aplicacao NAO chegou no painel do CRM, so na planilha. '
+          + 'Cadastre a mao ou chame o suporte. Motivo: ' + (ultimoErro && ultimoErro.message ? ultimoErro.message : ultimoErro)
+          + (dados.observacoes ? ' | Observacoes da pessoa: ' + dados.observacoes : ''),
+      });
+    }
+
     const secoes = ['s1','s2','s3','s4','s5'];
     const labels = [
       'Dados pessoais',
@@ -785,15 +831,10 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
       // Enviar para planilha
-      if (APPS_SCRIPT_URL !== 'SEU_APPS_SCRIPT_URL_AQUI') {
-        fetch(APPS_SCRIPT_URL + '?payload=' + encodeURIComponent(JSON.stringify(dados)), {
-          method: 'GET',
-          mode: 'no-cors'
-        });
-      }
+      mandarParaPlanilha(dados);
 
-      // Enviar para o CRM (best-effort)
-      enviarParaCRM(dados).catch(err => console.error('Falha ao enviar aplicação pro CRM:', err));
+      // Enviar para o CRM, com nova tentativa e aviso na planilha se não entrar
+      enviarParaCrmComAviso(dados);
     }
   </script>
 
