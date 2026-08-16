@@ -267,11 +267,16 @@
     }
 
     /* MSG ERRO */
+    /* Texto de 12px sem nenhuma marca visual passava despercebido mesmo quando
+       estava na tela. Barra lateral laranja para dar peso, mantendo o laranja
+       como destaque e nunca como fundo. */
     .msg-erro {
-      font-size: 12px;
+      font-size: 13px;
       color: #FD745D;
       font-weight: 600;
-      margin-top: 6px;
+      margin-top: 8px;
+      padding-left: 10px;
+      border-left: 3px solid #FD745D;
       display: none;
     }
 
@@ -600,6 +605,15 @@
         Obrigado por compartilhar tudo isso.<br /><br />
         Analisarei sua aplicação e entrarei em contato em até 48h pelo WhatsApp informado.
       </p>
+
+      <!-- Só aparece se a aplicação não conseguiu ser gravada em lugar nenhum.
+           Sem isso, uma falha de envio some sem deixar rastro para ninguém. -->
+      <p class="sucesso-texto" id="aviso-falha" style="display:none">
+        <strong>Só um aviso:</strong> a sua conexão oscilou e não consegui confirmar
+        o registro da sua aplicação. Para não correr o risco de ela se perder,
+        me mande uma mensagem em faleconosco@institutorumo.com dizendo que
+        preencheu o formulário. Eu recupero daqui.
+      </p>
     </div>
 
   </div>
@@ -631,11 +645,36 @@
       if (!r.ok) throw new Error('CRM respondeu ' + r.status + ': ' + await r.text());
     }
 
+    // Vai por POST, não por GET. O GET levava a aplicação inteira dentro da URL
+    // e o Google recusa a requisição com 400 acima de ~12 KB, antes mesmo de o
+    // script rodar. As cinco perguntas abertas deste formulário passam disso
+    // quando a pessoa escreve bastante, e era justamente quem escrevia mais que
+    // sumia. No corpo do POST não existe esse limite.
+    //
+    // Content-Type text/plain de propósito: mantém a requisição "simples", sem
+    // preflight (o Apps Script não responde OPTIONS). O script lê o corpo em
+    // e.postData.contents, que é o que rumo-reorientacao-script.gs faz.
     function mandarParaPlanilha(dados) {
-      if (APPS_SCRIPT_URL === 'SEU_APPS_SCRIPT_URL_AQUI') return;
-      fetch(APPS_SCRIPT_URL + '?payload=' + encodeURIComponent(JSON.stringify(dados)), {
-        method: 'GET',
-        mode: 'no-cors'
+      if (APPS_SCRIPT_URL === 'SEU_APPS_SCRIPT_URL_AQUI') return Promise.resolve();
+      return fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(dados)
+      }).then(function (r) {
+        if (!r.ok) throw new Error('Planilha respondeu ' + r.status);
+        return r.text();
+      }).then(function (texto) {
+        // O Apps Script devolve 200 mesmo quando falha por dentro: o erro vem
+        // no corpo. Sem olhar o corpo, a falha passa batido.
+        //
+        // Duas formas de resposta, de propósito: o deploy publicado hoje
+        // responde em texto puro ('erro: ...') e o rumo-reorientacao-script.gs
+        // responde em JSON ({"status":"erro"}). Cobrir as duas deixa isto
+        // funcionando antes e depois de ela republicar o script.
+        var t = (texto || '').trim();
+        if (t.indexOf('"erro"') !== -1 || t.slice(0, 5).toLowerCase() === 'erro:') {
+          throw new Error('Planilha recusou: ' + t.slice(0, 200));
+        }
       });
     }
 
@@ -653,28 +692,55 @@
     //
     // O envio normal para a planilha continua saindo primeiro e sem espera
     // nenhuma, igual antes. Nada aqui pode atrasar ou atrapalhar aquele.
-    async function enviarParaCrmComAviso(dados) {
+    // Tenta três vezes, com folga entre elas. A primeira tentativa sai na hora,
+    // sem espera. Devolve null se entrou, ou o último erro se não entrou.
+    async function tentar(fazer) {
       const esperas = [0, 2000, 5000];
       let ultimoErro;
 
       for (const ms of esperas) {
         if (ms) await espera(ms);
         try {
-          await enviarParaCRM(dados);
-          return;
+          await fazer();
+          return null;
         } catch (err) {
           ultimoErro = err;
-          console.error('Falha ao enviar aplicação pro CRM:', err);
+          console.error('Tentativa de envio falhou:', err);
         }
       }
+      return ultimoErro;
+    }
 
-      mandarParaPlanilha({
-        ...dados,
-        nome: 'NAO ENTROU NO CRM - ' + dados.nome,
-        observacoes: 'ATENCAO: esta aplicacao NAO chegou no painel do CRM, so na planilha. '
-          + 'Cadastre a mao ou chame o suporte. Motivo: ' + (ultimoErro && ultimoErro.message ? ultimoErro.message : ultimoErro)
-          + (dados.observacoes ? ' | Observacoes da pessoa: ' + dados.observacoes : ''),
-      });
+    // Os dois caminhos saem juntos e cada um se vira sozinho. Antes só o CRM
+    // tinha nova tentativa: a planilha era disparada uma vez e no escuro, então
+    // quando ela falhava ninguém ficava sabendo.
+    async function entregar(dados) {
+      const [erroPlanilha, erroCrm] = await Promise.all([
+        tentar(() => mandarParaPlanilha(dados)),
+        tentar(() => enviarParaCRM(dados)),
+      ]);
+
+      const motivo = e => (e && e.message ? e.message : String(e));
+
+      // CRM fora, planilha de pé: o aviso vai por onde ela já olha todo dia.
+      if (erroCrm && !erroPlanilha) {
+        await tentar(() => mandarParaPlanilha({
+          ...dados,
+          nome: 'NAO ENTROU NO CRM - ' + dados.nome,
+          observacoes: 'ATENCAO: esta aplicacao NAO chegou no painel do CRM, so na planilha. '
+            + 'Cadastre a mao ou chame o suporte. Motivo: ' + motivo(erroCrm)
+            + (dados.observacoes ? ' | Observacoes da pessoa: ' + dados.observacoes : ''),
+        }));
+      }
+
+      // Os dois fora: não sobrou canal nenhum e a aplicação se perde em silêncio,
+      // que é exatamente o que aconteceu antes. Agora a pessoa fica sabendo e
+      // consegue avisar por fora.
+      if (erroCrm && erroPlanilha) {
+        console.error('Aplicação não entrou em lugar nenhum.', { planilha: motivo(erroPlanilha), crm: motivo(erroCrm) });
+        const aviso = document.getElementById('aviso-falha');
+        if (aviso) aviso.style.display = 'block';
+      }
     }
 
     const secoes = ['s1','s2','s3','s4','s5'];
@@ -774,8 +840,31 @@
       return ok;
     }
 
+    // Leva a pessoa até o primeiro campo que faltou.
+    //
+    // Sem isto, quem esquecia uma pergunta clicava no botão e a página não se
+    // mexia: a mensagem de erro acendia fora da tela (medido: 422px acima do
+    // topo, num celular de 812px de altura) e o botão parecia morto. Foi por
+    // isso que uma candidata preencheu tudo e disse que "não enviou".
+    function irParaPrimeiroErro(n) {
+      const secao = document.getElementById('s' + n);
+      if (!secao) return;
+      const erro = secao.querySelector('.msg-erro.visivel');
+      if (!erro) return;
+
+      const campo = erro.closest('.campo') || erro;
+
+      const alvo = campo.querySelector('input, textarea, select');
+      if (alvo) alvo.focus({ preventScroll: true });
+
+      // Salto imediato, sem 'smooth' de propósito. A rolagem suave depende de
+      // animação e nem sempre acontece (medido: com 'smooth' a página não saía
+      // do lugar). Aqui é uma correção de erro, a pessoa precisa chegar lá.
+      campo.scrollIntoView({ block: 'center' });
+    }
+
     function avancar(n) {
-      if (!validar(n)) return;
+      if (!validar(n)) { irParaPrimeiroErro(n); return; }
       document.getElementById('s' + n).classList.remove('ativa');
       secaoAtual = n + 1;
       document.getElementById('s' + secaoAtual).classList.add('ativa');
@@ -792,7 +881,7 @@
     }
 
     function enviar() {
-      if (!validar(5)) return;
+      if (!validar(5)) { irParaPrimeiroErro(5); return; }
 
       const frasesSel = Array.from(document.querySelectorAll('input[name="frases"]:checked')).map(i => i.value).join('; ');
 
@@ -830,11 +919,9 @@
       document.querySelector('.progress-wrapper').style.display = 'none';
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      // Enviar para planilha
-      mandarParaPlanilha(dados);
-
-      // Enviar para o CRM, com nova tentativa e aviso na planilha se não entrar
-      enviarParaCrmComAviso(dados);
+      // Entrega nos dois destinos, com nova tentativa em cada um e aviso na
+      // tela se nenhum dos dois aceitar
+      entregar(dados);
     }
   </script>
 
