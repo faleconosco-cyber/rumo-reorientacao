@@ -577,16 +577,6 @@
       </div>
 
       <div class="campo">
-        <label>Independente da orientação personalizada, existe uma versão desse processo pensada para quem quer caminhar no próprio ritmo. Quer saber mais sobre ela? <span class="obrig">*</span></label>
-        <div class="radio-group" id="rg-autoguiada">
-          <label class="opcao"><input type="radio" name="autoguiada" value="Sim" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Sim</span></label>
-          <label class="opcao"><input type="radio" name="autoguiada" value="Talvez depois" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Talvez depois</span></label>
-          <label class="opcao"><input type="radio" name="autoguiada" value="Não preciso" onchange="selecionarOpcao(this)" /><span class="opcao-texto">Não preciso</span></label>
-        </div>
-        <div class="msg-erro" id="erro-autoguiada">Selecione uma opção.</div>
-      </div>
-
-      <div class="campo">
         <label for="observacoes">Alguma pergunta ou observação que queira compartilhar?</label>
         <textarea id="observacoes" placeholder="Este espaço é livre. Pode deixar em branco se preferir."></textarea>
       </div>
@@ -830,11 +820,9 @@
         const hor = document.querySelector('input[name="horario"]:checked');
         const ini = document.querySelector('input[name="inicio"]:checked');
         const inv = document.querySelector('input[name="investimento"]:checked');
-        const aut = document.querySelector('input[name="autoguiada"]:checked');
         mostrarErro('erro-horario', !hor); if (!hor) ok = false;
         mostrarErro('erro-inicio', !ini); if (!ini) ok = false;
         mostrarErro('erro-investimento', !inv); if (!inv) ok = false;
-        mostrarErro('erro-autoguiada', !aut); if (!aut) ok = false;
       }
 
       return ok;
