@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Triagem · Mudar de profissão — Rumo</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --laranja:#FD745D; --verde:#3B503F; --bordo:#6B2F3C; --creme:#FDDED5;
+    --creme-claro:#FFF8F5; --preto:#282828;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Montserrat',sans-serif;background:var(--creme-claro);color:var(--preto);min-height:100vh}
+  .header{padding:14px 24px;text-align:center;background:#3B503F}
+  .logo-img{height:74px;width:auto;display:block;margin:0 auto}
+  .logo{font-size:18px;font-weight:700;color:var(--bordo);letter-spacing:.08em;text-transform:uppercase}
+  .logo span{color:var(--laranja)}
+  .wrap{max-width:680px;margin:0 auto;padding:40px 20px 90px}
+  .tag{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--laranja);text-align:center;margin-bottom:16px}
+  h1{font-size:clamp(26px,5vw,38px);color:var(--bordo);text-align:center;line-height:1.25;margin-bottom:14px}
+  h1 em{font-style:normal;color:var(--laranja)}
+  .lead{font-size:15px;color:#555;text-align:center;line-height:1.7;margin-bottom:36px}
+  fieldset{border:none;margin-bottom:40px}
+  legend{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--laranja);margin-bottom:6px}
+  .sec-desc{font-size:14px;color:#666;line-height:1.6;margin-bottom:20px}
+  .field{margin-bottom:18px}
+  label.l{display:block;font-size:14px;font-weight:600;color:var(--bordo);margin-bottom:8px}
+  input[type=text],input[type=tel],input[type=number],select{
+    width:100%;background:#fff;border:1.5px solid rgba(40,40,40,.12);border-radius:12px;padding:14px 16px;
+    font-family:inherit;font-size:15px;color:var(--preto);transition:border .2s}
+  textarea{width:100%;background:#fff;border:1.5px solid rgba(40,40,40,.12);border-radius:12px;padding:14px 16px;
+    font-family:inherit;font-size:15px;color:var(--preto);line-height:1.5;resize:vertical;transition:border .2s}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--laranja)}
+  .field.invalido{border:1.5px solid #d9534f;border-radius:12px;padding:10px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:520px){.row{grid-template-columns:1fr}}
+
+  /* escala 1-5 */
+  .esc{background:#fff;border:1.5px solid rgba(40,40,40,.08);border-radius:14px;padding:16px 18px;margin-bottom:12px}
+  .esc .q{font-size:15px;font-weight:600;color:var(--bordo);margin-bottom:12px}
+  .esc .q small{display:block;font-weight:500;color:#888;font-size:12px;margin-top:2px}
+  .nums{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+  .nums input{position:absolute;opacity:0;pointer-events:none}
+  .nums label{display:flex;align-items:center;justify-content:center;height:48px;border-radius:12px;
+    border:1.5px solid rgba(40,40,40,.12);background:var(--creme-claro);font-weight:700;font-size:16px;cursor:pointer;transition:all .15s}
+  .nums label:hover{border-color:var(--laranja)}
+  .nums input:checked+label{background:var(--laranja);border-color:var(--laranja);color:#fff}
+  .nums input:focus-visible+label{outline:2px solid var(--bordo);outline-offset:2px}
+  .legenda{display:flex;justify-content:space-between;font-size:11px;color:#999;margin-top:8px}
+
+  /* perguntas */
+  .grupo{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--laranja);margin:26px 0 12px}
+  .perg{margin-bottom:22px}
+  .perg .q{font-size:16px;font-weight:700;color:var(--bordo);line-height:1.4;margin-bottom:12px}
+  .opt{display:block;position:relative;margin-bottom:8px}
+  .opt input{position:absolute;opacity:0;pointer-events:none}
+  .opt span{display:block;background:#fff;border:1.5px solid rgba(40,40,40,.1);border-radius:14px;padding:14px 18px;
+    font-size:14.5px;line-height:1.5;font-weight:500;cursor:pointer;transition:all .15s}
+  .opt span:hover{border-color:var(--laranja)}
+  .opt input:checked+span{border-color:var(--laranja);background:var(--creme);font-weight:600}
+  .opt input:focus-visible+span{outline:2px solid var(--bordo);outline-offset:2px}
+
+  .consent{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:#555;line-height:1.55;margin:10px 0 24px}
+  .consent input{margin-top:3px;accent-color:var(--laranja)}
+  .btn{width:100%;background:var(--laranja);color:#fff;border:none;border-radius:12px;padding:18px;font-family:inherit;
+    font-size:16px;font-weight:600;cursor:pointer;transition:all .2s}
+  .btn:hover{background:#e8604a;transform:translateY(-2px);box-shadow:0 8px 24px rgba(253,116,93,.35)}
+  .btn:disabled{opacity:.6;cursor:wait;transform:none;box-shadow:none}
+  .erro{display:none;background:#fdecea;border:1px solid #f5b5ad;color:#8a2b1f;border-radius:12px;padding:14px 16px;font-size:14px;margin-bottom:16px}
+  .erro.on{display:block}
+  .invalido{border-color:#d9534f!important}
+  .obrigado{display:none;text-align:center;padding:40px 0}
+  .obrigado.on{display:block}
+  .obrigado h2{font-size:28px;color:var(--bordo);margin-bottom:14px}
+  .obrigado p{font-size:15px;color:#555;line-height:1.7}
+  .aviso-teste{display:none;margin-top:22px;background:#fff7e0;border:1px solid #f0d78c;color:#7a5b00;border-radius:12px;padding:12px 16px;font-size:13px}
+  .aviso-teste.on{display:block}
+</style>
+</head>
+<body>
+<header class="header"><img src="logo-rumo-horizontal.png?v=2" alt="Rumo" class="logo-img"></header>
+
+<main class="wrap">
+<form id="form" novalidate>
+  <p class="tag">Triagem · Mudança de profissão</p>
+  <h1>Algo está pedindo <em>passagem</em> na sua carreira?</h1>
+  <p class="lead">Responda com calma e com sinceridade. Não existe resposta certa ou errada, e leva uns 5 minutos.</p>
+
+  <fieldset>
+    <legend>1 · Sobre você</legend>
+    <div class="field">
+      <label class="l" for="nome">Seu nome completo</label>
+      <input type="text" id="nome" name="nome" autocomplete="name" required>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label class="l" for="idade">Idade</label>
+        <input type="number" id="idade" name="idade" min="14" max="99" inputmode="numeric" required>
+      </div>
+      <div class="field">
+        <label class="l" for="whatsapp">WhatsApp (com DDD)</label>
+        <input type="tel" id="whatsapp" name="whatsapp" placeholder="(11) 99999-9999" autocomplete="tel" inputmode="tel" required>
+      </div>
+    </div>
+    <div class="field" data-grupo="origem">
+      <label class="l">Como você soube de nós? <small style="font-weight:500;color:#888">(pode marcar mais de uma)</small></label>
+      <label class="opt"><input type="checkbox" name="origem" value="Indicação de amigos, conhecidos ou familiares"><span>Indicação de amigos, conhecidos ou familiares</span></label>
+      <label class="opt"><input type="checkbox" name="origem" value="Indicação de psicólogo(a)"><span>Indicação de psicólogo(a)</span></label>
+      <label class="opt"><input type="checkbox" name="origem" value="Google"><span>Google</span></label>
+      <label class="opt"><input type="checkbox" name="origem" value="Instagram"><span>Instagram</span></label>
+    </div>
+    <div class="field">
+      <label class="l" for="cargo">Cargo ou função que você ocupa hoje</label>
+      <input type="text" id="cargo" name="cargo" placeholder="Ex.: analista financeiro, professora, vendedor" required>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label class="l" for="formacao_tipo">Formação (tipo de curso)</label>
+        <select id="formacao_tipo" name="formacao_tipo" required>
+          <option value="">Escolha uma opção</option>
+          <option>Ensino médio</option>
+          <option>Curso técnico</option>
+          <option>Graduação (faculdade)</option>
+          <option>Pós-graduação / especialização / MBA</option>
+          <option>Mestrado ou doutorado</option>
+          <option>Cursos livres / profissionalizantes</option>
+          <option>Ainda estou cursando</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="l" for="formacao_curso">Qual curso?</label>
+        <input type="text" id="formacao_curso" name="formacao_curso" placeholder="Ex.: Administração">
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>2 · Seu trabalho hoje</legend>
+    <div class="esc" data-grupo="p2">
+    <p class="q">Como você descreveria a sua relação com o trabalho hoje?</p>
+    <div class="nums">
+      <input type="radio" name="p2" id="p2-1" value="1"><label for="p2-1">1</label>
+      <input type="radio" name="p2" id="p2-2" value="2"><label for="p2-2">2</label>
+      <input type="radio" name="p2" id="p2-3" value="3"><label for="p2-3">3</label>
+      <input type="radio" name="p2" id="p2-4" value="4"><label for="p2-4">4</label>
+      <input type="radio" name="p2" id="p2-5" value="5"><label for="p2-5">5</label>
+    </div>
+    <div class="legenda"><span>1 = muito ruim</span><span>5 = muito boa</span></div>
+  </div>
+    <p class="sec-desc" style="margin-top:22px">De <strong>1 a 5</strong>, o quanto você se sente insatisfeito(a) com cada ponto do seu trabalho? <br>1 = nada insatisfeito(a) · 5 = muito insatisfeito(a)</p>
+    <div id="escalas">
+  <div class="esc" data-grupo="funcao">
+    <p class="q">Com a sua função<small>o que você faz no dia a dia</small></p>
+    <div class="nums">
+      <input type="radio" name="funcao" id="funcao-1" value="1"><label for="funcao-1">1</label>
+      <input type="radio" name="funcao" id="funcao-2" value="2"><label for="funcao-2">2</label>
+      <input type="radio" name="funcao" id="funcao-3" value="3"><label for="funcao-3">3</label>
+      <input type="radio" name="funcao" id="funcao-4" value="4"><label for="funcao-4">4</label>
+      <input type="radio" name="funcao" id="funcao-5" value="5"><label for="funcao-5">5</label>
+    </div>
+    <div class="legenda"><span>nada insatisfeito(a)</span><span>muito insatisfeito(a)</span></div>
+  </div>
+  <div class="esc" data-grupo="empresa">
+    <p class="q">Com a empresa<small>o lugar, a cultura, a liderança</small></p>
+    <div class="nums">
+      <input type="radio" name="empresa" id="empresa-1" value="1"><label for="empresa-1">1</label>
+      <input type="radio" name="empresa" id="empresa-2" value="2"><label for="empresa-2">2</label>
+      <input type="radio" name="empresa" id="empresa-3" value="3"><label for="empresa-3">3</label>
+      <input type="radio" name="empresa" id="empresa-4" value="4"><label for="empresa-4">4</label>
+      <input type="radio" name="empresa" id="empresa-5" value="5"><label for="empresa-5">5</label>
+    </div>
+    <div class="legenda"><span>nada insatisfeito(a)</span><span>muito insatisfeito(a)</span></div>
+  </div>
+  <div class="esc" data-grupo="salario">
+    <p class="q">Com o salário<small>o que você ganha e as perspectivas de crescimento</small></p>
+    <div class="nums">
+      <input type="radio" name="salario" id="salario-1" value="1"><label for="salario-1">1</label>
+      <input type="radio" name="salario" id="salario-2" value="2"><label for="salario-2">2</label>
+      <input type="radio" name="salario" id="salario-3" value="3"><label for="salario-3">3</label>
+      <input type="radio" name="salario" id="salario-4" value="4"><label for="salario-4">4</label>
+      <input type="radio" name="salario" id="salario-5" value="5"><label for="salario-5">5</label>
+    </div>
+    <div class="legenda"><span>nada insatisfeito(a)</span><span>muito insatisfeito(a)</span></div>
+  </div>
+  <div class="esc" data-grupo="rotina">
+    <p class="q">Com a rotina<small>horários, deslocamento, ritmo, carga de trabalho</small></p>
+    <div class="nums">
+      <input type="radio" name="rotina" id="rotina-1" value="1"><label for="rotina-1">1</label>
+      <input type="radio" name="rotina" id="rotina-2" value="2"><label for="rotina-2">2</label>
+      <input type="radio" name="rotina" id="rotina-3" value="3"><label for="rotina-3">3</label>
+      <input type="radio" name="rotina" id="rotina-4" value="4"><label for="rotina-4">4</label>
+      <input type="radio" name="rotina" id="rotina-5" value="5"><label for="rotina-5">5</label>
+    </div>
+    <div class="legenda"><span>nada insatisfeito(a)</span><span>muito insatisfeito(a)</span></div>
+  </div>
+    </div>
+    <div class="perg" data-grupo="p1">
+    <p class="q">Quando você pensa em ir trabalhar amanhã, o que aparece primeiro?</p>
+    <label class="opt"><input type="radio" name="p1" value="Um cansaço que já virou rotina"><span>Um cansaço que já virou rotina</span></label>
+    <label class="opt"><input type="radio" name="p1" value="Uma resistência que eu não consigo explicar"><span>Uma resistência que eu não consigo explicar</span></label>
+    <label class="opt"><input type="radio" name="p1" value="Nada de especial — vou porque preciso"><span>Nada de especial — vou porque preciso</span></label>
+    <label class="opt"><input type="radio" name="p1" value="Uma angústia de verdade"><span>Uma angústia de verdade</span></label>
+  </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>3 · O seu incômodo</legend>
+    <div class="field">
+      <label class="l" for="tempo">Há quanto tempo você se sente incomodado?</label>
+      <textarea id="tempo" name="tempo" rows="2" maxlength="200" required></textarea>
+    </div>
+    <div class="field">
+      <label class="l" for="tentou">O que você já tentou fazer para mudar a sua situação profissional?</label>
+      <textarea id="tentou" name="tentou" rows="3" required></textarea>
+    </div>
+    <div class="field">
+      <label class="l" for="mudar_vida">Quando considera mudar de vida, o que passa pela sua cabeça?</label>
+      <textarea id="mudar_vida" name="mudar_vida" rows="3" required></textarea>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>4 · O que você quer</legend>
+    <div class="perg" data-grupo="p10">
+    <p class="q">Quando pensa no que quer profissionalmente, você consegue:</p>
+    <label class="opt"><input type="radio" name="p10" value="Ter uma ideia vaga, mas nada concreto"><span>Ter uma ideia vaga, mas nada concreto</span></label>
+    <label class="opt"><input type="radio" name="p10" value="Não sei nem por onde começar a responder essa pergunta"><span>Não sei nem por onde começar a responder essa pergunta</span></label>
+    <label class="opt"><input type="radio" name="p10" value="Identificar o que não quero, mas não o que quero"><span>Identificar o que não quero, mas não o que quero</span></label>
+    <label class="opt"><input type="radio" name="p10" value="Tenho algumas ideias, mas não sei se são reais para mim"><span>Tenho algumas ideias, mas não sei se são reais para mim</span></label>
+  </div>
+    <div class="field">
+      <label class="l" for="ideal">O que seria pra você um "trabalho ideal"?</label>
+      <textarea id="ideal" name="ideal" rows="3" required></textarea>
+    </div>
+    <div class="field" id="bloco-espera" data-grupo="espera">
+      <label class="l">O que você espera de um trabalho de orientação profissional? <small style="font-weight:500;color:#888">(pode marcar mais de uma)</small></label>
+      <label class="opt"><input type="checkbox" name="espera" value="Me diga o que fazer"><span>Me diga o que fazer</span></label>
+      <label class="opt"><input type="checkbox" name="espera" value="Me ajude a definir objetivos"><span>Me ajude a definir objetivos</span></label>
+      <label class="opt"><input type="checkbox" name="espera" value="Me auxilie a construir critérios"><span>Me auxilie a construir critérios</span></label>
+      <label class="opt"><input type="checkbox" name="espera" value="Me ajude a enxergar possibilidades"><span>Me ajude a enxergar possibilidades</span></label>
+      <label class="opt"><input type="checkbox" name="espera" value="Me ajude a identificar interesses e habilidades"><span>Me ajude a identificar interesses e habilidades</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>5 · Saúde, investimento e horários</legend>
+    <p class="sec-desc">Estas informações ficam só com a equipe do Instituto Rumo e nos ajudam a conduzir o seu processo com cuidado.</p>
+
+    <div class="field" data-grupo="psicologo">
+      <label class="l">Você faz ou já fez acompanhamento com psicólogo(a)?</label>
+      <label class="opt"><input type="radio" name="psicologo" value="Faço atualmente"><span>Faço atualmente</span></label>
+      <label class="opt"><input type="radio" name="psicologo" value="Já fiz"><span>Já fiz</span></label>
+      <label class="opt"><input type="radio" name="psicologo" value="Nunca fiz"><span>Nunca fiz</span></label>
+    </div>
+    <div class="field" data-grupo="psiquiatra">
+      <label class="l">Você faz ou já fez acompanhamento com psiquiatra?</label>
+      <label class="opt"><input type="radio" name="psiquiatra" value="Faço atualmente"><span>Faço atualmente</span></label>
+      <label class="opt"><input type="radio" name="psiquiatra" value="Já fiz"><span>Já fiz</span></label>
+      <label class="opt"><input type="radio" name="psiquiatra" value="Nunca fiz"><span>Nunca fiz</span></label>
+    </div>
+    <div class="field" data-grupo="diagnostico">
+      <label class="l">Você tem algum diagnóstico psiquiátrico?</label>
+      <label class="opt"><input type="radio" name="diagnostico" value="Sim"><span>Sim</span></label>
+      <label class="opt"><input type="radio" name="diagnostico" value="Não"><span>Não</span></label>
+      <input type="text" id="diagnostico_qual" name="diagnostico_qual" placeholder="Se quiser, conte qual (opcional)" style="margin-top:6px">
+    </div>
+    <div class="field" data-grupo="medicacao">
+      <label class="l">Você utiliza alguma medicação psiquiátrica?</label>
+      <label class="opt"><input type="radio" name="medicacao" value="Sim"><span>Sim</span></label>
+      <label class="opt"><input type="radio" name="medicacao" value="Não"><span>Não</span></label>
+    </div>
+
+    <div class="field" data-grupo="honorario">
+      <label class="l">Qual a sua disponibilidade financeira para investir em orientação profissional?<small style="display:block;font-weight:500;color:#888;font-size:12px;margin-top:2px">Pense no honorário de uma sessão semanal de 50 minutos.</small></label>
+      <label class="opt"><input type="radio" name="honorario" value="Até R$ 150"><span>Até R$ 150,00</span></label>
+      <label class="opt"><input type="radio" name="honorario" value="Até R$ 200"><span>Até R$ 200,00</span></label>
+      <label class="opt"><input type="radio" name="honorario" value="Até R$ 250"><span>Até R$ 250,00</span></label>
+      <label class="opt"><input type="radio" name="honorario" value="Até R$ 300"><span>Até R$ 300,00</span></label>
+      <label class="opt"><input type="radio" name="honorario" value="Até R$ 350"><span>Até R$ 350,00</span></label>
+    </div>
+
+    <div class="field" data-grupo="horario">
+      <label class="l">Qual a sua disponibilidade de horário? <small style="font-weight:500;color:#888">(pode marcar mais de um)</small></label>
+      <label class="opt"><input type="checkbox" name="horario" value="Manhã"><span>Manhã</span></label>
+      <label class="opt"><input type="checkbox" name="horario" value="Tarde"><span>Tarde</span></label>
+      <label class="opt"><input type="checkbox" name="horario" value="Noite"><span>Noite</span></label>
+    </div>
+
+    <div class="field">
+      <label class="l" for="compartilhar">Existe algo que você queira compartilhar antes da conversa de triagem? <small style="font-weight:500;color:#888">(opcional)</small></label>
+      <textarea id="compartilhar" name="compartilhar" rows="3"></textarea>
+    </div>
+  </fieldset>
+
+  <label class="consent">
+    <input type="checkbox" id="consent" required>
+    <span>Autorizo o Instituto Rumo a usar estas respostas, inclusive as de saúde, para me conhecer melhor e a entrar em contato comigo pelo WhatsApp.</span>
+  </label>
+
+  <div class="erro" id="erro" role="alert"></div>
+  <button type="submit" class="btn" id="enviar">Enviar minhas respostas</button>
+</form>
+
+<section class="obrigado" id="obrigado" aria-live="polite">
+  <h2>Recebemos suas respostas 🧡</h2>
+  <p>Obrigado por ter dedicado esse tempo. Vamos olhar com carinho o que você contou e entrar em contato pelo WhatsApp.</p>
+  <p class="aviso-teste" id="aviso-teste">Modo de teste: as respostas ainda não estão sendo guardadas em nenhum lugar.</p>
+</section>
+</main>
+
+<script>
+/* Envio para o CRM do Rumo (mesmo projeto Supabase do rumo-crm; chave pública, protegida pelo banco).
+   Ligado em 11/11/2026, depois de aplicar a migration 021 no banco real. Se voltar a false,
+   o formulário funciona em modo de teste e NÃO guarda nada. */
+const CRM_ATIVO = true;
+const SUPABASE_URL = 'https://ipgyrwxnvtuetnuyryzk.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_JELHL8UlHqaGdnhhD2Ycqg_LnCBoDjr';
+
+const ESCALAS = [
+  {id:"funcao",  t:"Com a sua função",  s:"o que você faz no dia a dia"},
+  {id:"empresa", t:"Com a empresa",     s:"o lugar, a cultura, a liderança"},
+  {id:"salario", t:"Com o salário",     s:"o que você ganha e as perspectivas de crescimento"},
+  {id:"rotina",  t:"Com a rotina",      s:"horários, deslocamento, ritmo, carga de trabalho"}
+];
+
+const PERGUNTAS = [
+  {g:"O que você sente", id:"p1", q:"Quando você pensa em ir trabalhar amanhã, o que aparece primeiro?", o:[
+    "Um cansaço que já virou rotina","Uma resistência que eu não consigo explicar","Nada de especial — vou porque preciso","Uma angústia de verdade"]},
+  {g:"O que você sente", id:"p2", q:"Como você descreveria a sua relação com o trabalho hoje?", escala:true, a:"muito ruim", b:"muito boa"},
+  {g:"O que você quer", id:"p10", q:"Quando pensa no que quer profissionalmente, você consegue:", o:[
+    "Ter uma ideia vaga, mas nada concreto","Não sei nem por onde começar a responder essa pergunta","Identificar o que não quero, mas não o que quero","Tenho algumas ideias, mas não sei se são reais para mim"]},
+];
+
+// máscara do WhatsApp
+const zap = document.getElementById('whatsapp');
+zap.addEventListener('input', () => {
+  let d = zap.value.replace(/\D/g,'').slice(0,11);
+  if (d.length > 6) zap.value = `(${d.slice(0,2)}) ${d.slice(2, d.length > 10 ? 7 : 6)}-${d.slice(d.length > 10 ? 7 : 6)}`;
+  else if (d.length > 2) zap.value = `(${d.slice(0,2)}) ${d.slice(2)}`;
+  else zap.value = d;
+});
+
+const form = document.getElementById('form');
+const erro = document.getElementById('erro');
+
+form.addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+  document.querySelectorAll('.invalido').forEach(x => x.classList.remove('invalido'));
+  const faltando = [];
+  const v = id => document.getElementById(id).value.trim();
+  const marca = (id) => { const el = document.getElementById(id); el.classList.add('invalido'); return el; };
+
+  if (v('nome').split(/\s+/).filter(Boolean).length < 2) faltando.push(marca('nome'));
+  const idade = Number(v('idade')); if (!(idade >= 14 && idade <= 99)) faltando.push(marca('idade'));
+  const dig = v('whatsapp').replace(/\D/g,''); if (dig.length < 10) faltando.push(marca('whatsapp'));
+  if (!form.querySelector('input[name="origem"]:checked')) { const b = form.querySelector('[data-grupo="origem"]'); b.classList.add('invalido'); faltando.push(b); }
+  if (!v('cargo')) faltando.push(marca('cargo'));
+  if (!v('formacao_tipo')) faltando.push(marca('formacao_tipo'));
+  [...ESCALAS.map(e => e.id), ...PERGUNTAS.map(p => p.id)].forEach(n => {
+    if (!form.querySelector(`input[name="${n}"]:checked`)) {
+      const bloco = form.querySelector(`[data-grupo="${n}"]`); bloco.classList.add('invalido'); faltando.push(bloco);
+    }
+  });
+  ['tentou','tempo','mudar_vida','ideal'].forEach(id => { if (v(id).length < 3) faltando.push(marca(id)); });
+  if (!form.querySelector('input[name="espera"]:checked')) { const b = document.getElementById('bloco-espera'); b.classList.add('invalido'); faltando.push(b); }
+  ['psicologo','psiquiatra','diagnostico','medicacao','honorario'].forEach(n => {
+    if (!form.querySelector(`input[name="${n}"]:checked`)) { const b = form.querySelector(`[data-grupo="${n}"]`); b.classList.add('invalido'); faltando.push(b); }
+  });
+  if (!form.querySelector('input[name="horario"]:checked')) { const b = form.querySelector('[data-grupo="horario"]'); b.classList.add('invalido'); faltando.push(b); }
+  if (!document.getElementById('consent').checked) faltando.push(document.getElementById('consent'));
+
+  if (faltando.length) {
+    erro.textContent = "Faltam algumas respostas. Confira os campos marcados em vermelho.";
+    erro.classList.add('on');
+    faltando[0].scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  erro.classList.remove('on');
+
+  const dados = {
+    tipo_triagem: "mudar_de_trabalho",
+    identificacao: "Reorientação profissional - empregado",
+    enviado_em: new Date().toISOString(),
+    nome: v('nome'), idade, whatsapp: dig,
+    como_soube: [...form.querySelectorAll('input[name="origem"]:checked')].map(x => x.value),
+    cargo: v('cargo'), formacao_tipo: v('formacao_tipo'), formacao_curso: v('formacao_curso'),
+    insatisfacao: Object.fromEntries(ESCALAS.map(e => [e.id, Number(form.querySelector(`input[name="${e.id}"]:checked`).value)])),
+    respostas: Object.fromEntries(PERGUNTAS.map(p => [p.id, { pergunta: p.q, resposta: form.querySelector(`input[name="${p.id}"]:checked`).value }])),
+    com_suas_palavras: {
+      ja_tentou: v('tentou'), incomodado_ha: v('tempo'), pensa_ao_mudar_de_vida: v('mudar_vida'), trabalho_ideal: v('ideal'),
+      espera_da_orientacao: [...form.querySelectorAll('input[name="espera"]:checked')].map(x => x.value)
+    },
+    saude_e_organizacao: {
+      psicologo: form.querySelector('input[name="psicologo"]:checked').value,
+      psiquiatra: form.querySelector('input[name="psiquiatra"]:checked').value,
+      diagnostico_psiquiatrico: form.querySelector('input[name="diagnostico"]:checked').value,
+      diagnostico_qual: v('diagnostico_qual'),
+      medicacao_psiquiatrica: form.querySelector('input[name="medicacao"]:checked').value,
+      honorario_ate: form.querySelector('input[name="honorario"]:checked').value,
+      horarios: [...form.querySelectorAll('input[name="horario"]:checked')].map(x => x.value),
+      algo_a_compartilhar: v('compartilhar')
+    },
+    autorizou_contato: true
+  };
+
+  const btn = document.getElementById('enviar'); btn.disabled = true; btn.textContent = "Enviando…";
+  try {
+    if (CRM_ATIVO) {
+      const r = await fetch(SUPABASE_URL + '/rest/v1/rpc/criar_triagem_mudar_trabalho', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY},
+        body: JSON.stringify({ triagem: dados })
+      });
+      if (!r.ok) throw new Error('CRM respondeu ' + r.status);
+    } else {
+      console.log('Modo de teste — respostas:', dados);
+      document.getElementById('aviso-teste').classList.add('on');
+    }
+    form.style.display = 'none';
+    document.getElementById('obrigado').classList.add('on');
+    window.scrollTo({top:0, behavior:'smooth'});
+  } catch (e) {
+    btn.disabled = false; btn.textContent = "Enviar minhas respostas";
+    erro.textContent = "Não consegui enviar agora. Confira a internet e tente de novo.";
+    erro.classList.add('on');
+  }
+});
+</script>
+</body>
+</html>
